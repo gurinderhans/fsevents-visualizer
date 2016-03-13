@@ -1,8 +1,17 @@
 var width = window.innerWidth,
     height = window.innerHeight;
-var svg = d3.select("body").append("svg")
+
+var outer = d3.select("div#graph").append("svg")
+	.call(d3.behavior.zoom().on("zoom", rescale))
+	.on("dblclick.zoom", null)
+	.attr("width", width)
+	.attr("height", height)
+	.attr("pointer-events", "all");
+
+var svg = outer.append("svg:g")
     .attr("width", width)
     .attr("height", height);
+
 var node = svg.selectAll(".node"),
     link = svg.selectAll(".link");
 var nodes = [],
@@ -22,7 +31,7 @@ var force = d3.layout.force()
     .nodes(nodes)
     .links(links)
     .charge(-400)
-    .linkDistance(120)
+    .linkDistance(10)
     .size([width, height])
     .on("tick", function() {
 		node.attr("cx", function(d) { return d.x; })
@@ -32,7 +41,6 @@ var force = d3.layout.force()
 			.attr("x2", function(d) { return d.target.x; })
 			.attr("y2", function(d) { return d.target.y; });
 	});
-
 
 function update() {
 	link = link.data(force.links());
@@ -46,6 +54,14 @@ function update() {
 	node.exit().remove();
 
 	force.start();
+}
+
+// Rescale function, called on zoom event
+function rescale() {
+	trans = d3.event.translate;
+	scale = d3.event.scale;
+	svg.attr("transform",
+		"translate(" + trans + ")" + " scale(" + scale + ")");
 }
 
 
@@ -179,6 +195,6 @@ function addPathToTree(path) {
 
 /// MARK:- Tests
 
-addPathToTree("/var/www/html/other");
-addPathToTree("/private/var/db/local");
-addPathToTree("/var/www/html/mysite/js/jquerylib");
+// addPathToTree("/var/www/html/other");
+// addPathToTree("/private/var/db/local");
+// addPathToTree("/var/www/html/mysite/js/jquerylib");
