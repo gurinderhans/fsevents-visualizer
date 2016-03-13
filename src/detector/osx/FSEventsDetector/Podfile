@@ -1,0 +1,7 @@
+use_frameworks!
+
+target 'FSEventsDetector' do
+	pod 'SwiftFSWatcher'
+	pod 'SwiftWebSocket', '~> 2.5'
+end
+
