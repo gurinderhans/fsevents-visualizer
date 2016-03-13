@@ -40,17 +40,24 @@ function update() {
 
 
 /// MARK: - data parsing methods (AKA. front-end layer for the tree)
-var FTree = [{
-	"path": "root",
-	"type": "tree",
-	"size": 0,
-	"parent": null,
-	"filename": "root",
-	"name": "root",
-	"children": [],
-}]
 
-function getPathTree(path) {
+function getPathHistoryArray(path, arr = []) {
+	if (path.indexOf("/") == 0) {
+		path = path.slice(1, path.length);
+	}
+	if (path.lastIndexOf("/") == path.length - 1) {
+		path = path.slice(0, path.length - 2);
+	}
+
+	var slashIndex = path.lastIndexOf("/")
+	if (~slashIndex) {
+		getPathHistoryArray(path.slice(0, slashIndex), arr)
+	}
+	arr.push(path)
+	return arr
+}
+
+function addPathToTree(path) {
 
 	var pathHistory = getPathHistoryArray(path).map(function(d) {
 		return { path: d, size: 123 };
@@ -90,42 +97,122 @@ function getPathTree(path) {
 			pathTree.push(node);
 		}
 	});
-	
-	return pathTree;
-}
 
-function getPathHistoryArray(path, arr = []) {
-	if (path.indexOf("/") == 0) {
-		path = path.slice(1, path.length);
-	}
-	if (path.lastIndexOf("/") == path.length - 1) {
-		path = path.slice(0, path.length - 2);
+	// filter tree nodes and links here to prevent dups
+	var treeNodes = d3.layout.tree().nodes(pathTree[0]);
+	var treeLinks = d3.layout.tree().links(treeNodes);
+
+	// all existing nodes in the tree
+	var nodesArr = nodes.map(function(d) { return d.path; });
+	var localNodes = treeNodes.map(function(d) { return d.path; });
+
+	console.log("treeNodes:", nodesArr.slice(1, nodesArr.length));
+	console.log("localNodes:", localNodes);
+
+	// index of treeNodes where the branch breaks and we keep idx -> END nodes
+	// in other words, the last node which already exists in the existing tree
+	var localTreeBreakingIndex;
+
+	for (var i = 2; i < nodesArr.length + 1; i++) {
+		var thisIndex = localNodes.indexOf(nodesArr[i]);
+		var prevIndex = localNodes.indexOf(nodesArr[i - 1]);
+
+		if (prevIndex > 0 && thisIndex < 0) { // this here will for sure only happen once, since the path here speartes into its own unique branch
+			localTreeBreakingIndex = prevIndex;
+			break;
+		}
 	}
 
-	var slashIndex = path.lastIndexOf("/")
-	if (~slashIndex) {
-		getPathHistoryArray(path.slice(0, slashIndex), arr)
+	if (localTreeBreakingIndex == treeNodes.length - 1) { // this whole path is a copy and it already exists
+		return;
 	}
-	arr.push(path)
-	return arr
+
+	if (localTreeBreakingIndex === undefined) {
+		// this is a totally new branch, add all nodes and hook first node to root and it's over
+		console.log("new branch");
+
+		// connect link back to root
+		treeLinks.unshift({
+			source: nodes[0],
+			target: treeNodes[0]
+		})
+		for (var i = 0; i < treeNodes.length; i++) {
+			nodes.push(treeNodes[i])
+		}
+
+		// console.log("links:", treeLinks);
+		for (var i = 0; i < treeLinks.length; i++) {
+			links.push(treeLinks[i])
+		}
+	} else {
+		// this is a partial branch, only add nodes > (localTreeBreakingIndex + 1) and links carefully
+		// TODO: need the index of node where this new partial branch of nodes will be attached at
+		var branchingOffIndex = nodesArr.indexOf(localNodes[localTreeBreakingIndex]);
+		var newNodes = treeNodes.slice(localTreeBreakingIndex + 1, treeNodes.length);
+		var newLinks = d3.layout.tree().links(newNodes);
+		newLinks.unshift({
+			source: nodes[branchingOffIndex],
+			target: newNodes[0]
+		})
+
+		for (var i = 0; i < newNodes.length; i++) {
+			nodes.push(newNodes[i])
+		}
+
+		// console.log("links:", treeLinks);
+		for (var i = 0; i < newLinks.length; i++) {
+			links.push(newLinks[i])
+		}
+		// console.log("newLinks:", newLinks)
+		// console.log("partial branch, branching index:", branchingOffIndex);
+		// console.log(branchingOffIndex)
+	}
+
+	// for (var i = 1; i < nodesArr.length; i++) {
+	// 	var nn = nodesArr[i];
+	// 	var idx = localNodes.indexOf(nn);
+	// 	console.log(idx)
+	// 	if (idx > 0) {
+	// 		localTreeBreakingIndex = idx;
+	// 		return;
+	// 	}
+	// }
+	// console.log("breaking idx:", localTreeBreakingIndex);
+
+
+
+	update();
 }
 
 
 
 /// MARK:- Tests
 
-var tree = getPathTree("/var/www/html/mysite/js");
-var treeNodes = d3.layout.tree().nodes(tree[0]);
-var treeLinks = d3.layout.tree().links(treeNodes);
-for (var i = 0; i < treeLinks.length; i++) {
-	var l = treeLinks[i];
-	links.push(l)
-}
-for (var i = 0; i < treeNodes.length; i++) {
-	var n = treeNodes[i];
-	nodes.push(n)
-}
-update();
+// add root node
+nodes.push({
+	"path": "root",
+	"type": "tree",
+	"size": 0,
+	"parent": null,
+	"filename": "root",
+	"name": "root"
+});
+
+addPathToTree("/var/www/html/other");
+// addPathToTree("/private/var/db/local");
+// addPathToTree("/var/www/html/mysite/js/jquerylib");
+
+// var treeNodes = d3.layout.tree().nodes(tree[0]);
+// var treeLinks = d3.layout.tree().links(treeNodes);
+// for (var i = 0; i < treeLinks.length; i++) {
+// 	var l = treeLinks[i];
+// 	links.push(l)
+// }
+// for (var i = 0; i < treeNodes.length; i++) {
+// 	var n = treeNodes[i];
+// 	nodes.push(n)
+// }
+// update();
 
 
 
