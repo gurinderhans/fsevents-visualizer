@@ -12,7 +12,6 @@ import SwiftWebSocket
 
 class ViewController: NSViewController {
 
-
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -33,9 +32,30 @@ class ViewController: NSViewController {
         😎.paths = ["/"]
         😎.watch()
         😎.onFileChange = {numEvents, changedPaths in
-            😇.send(changedPaths)
+            if let paths = (changedPaths as NSArray) as? [String] {
+                var pathsDict = [[String: String]]()
+                for path in paths {
+                    do {
+                        let attrs = try NSFileManager.defaultManager().attributesOfItemAtPath(path)
+                        if let sz = attrs["NSFileSize"] as? Int {
+                            var pdict = [String:String]()
+                            pdict["path"] = path
+                            pdict["size"] = String(sz)
+                            pathsDict.append(pdict)
+                        }
+                    } catch _ {}
+                }
+                
+                do {
+                    let jsonData = try NSJSONSerialization.dataWithJSONObject(pathsDict, options: NSJSONWritingOptions.PrettyPrinted)
+                    if let theJSONText = NSString(data: jsonData, encoding: NSASCIIStringEncoding) {
+                        😇.send(theJSONText)
+                    }
+                } catch let error as NSError {
+                    print(error)
+                }
+            }
         }
     }
-
 }
 

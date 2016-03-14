@@ -17,6 +17,8 @@ var node = svg.selectAll(".node"),
 var nodes = [],
     links = [];
 
+var color = d3.scale.category20b();
+
 // add ROOT node
 nodes.push({
 	"path": "root",
@@ -48,9 +50,13 @@ function update() {
 	link.exit().remove();
 
 	node = node.data(force.nodes());
-	node.enter().append("circle").attr("class", "node").attr("r", function(d) {
-		return d.path == 'root' ? 15 : (Math.log(d.size + 1) || 3);
-	});
+	node.enter().append("circle").attr("class", "node")
+		.attr("r", function(d) {
+			return d.path == 'root' ? 15 : (Math.log(d.size + 1) || 3);
+		})
+		.style("fill", function(d) {
+			return d.name === "root" ? '#f00' : color(d.path.length);
+		});
 	node.exit().remove();
 
 	force.start();
@@ -83,10 +89,10 @@ function getPathHistoryArray(path, arr = []) {
 	return arr
 }
 
-function addPathToTree(path) {
+function addPathToTree(path, size) {
 
 	var pathHistory = getPathHistoryArray(path).map(function(d) {
-		return { path: d, size: 123 };
+		return { path: d, size: size };
 	});
 
 	// add additional properties
@@ -194,7 +200,6 @@ function addPathToTree(path) {
 
 
 /// MARK:- Tests
-
-// addPathToTree("/var/www/html/other");
-// addPathToTree("/private/var/db/local");
-// addPathToTree("/var/www/html/mysite/js/jquerylib");
+// addPathToTree("/var/www/html/other",123);
+// addPathToTree("/private/var/db/local",456);
+// addPathToTree("/var/www/html/mysite/js/jquerylib",789);

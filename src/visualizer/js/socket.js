@@ -10,28 +10,21 @@ function testWebSocket() {
 }
 
 function onOpen(evt) {
-    log("CONNECTED");
+    console.log("CONNECTED");
 }
 
 function onClose(evt) {
-    log("DISCONNECTED");
+    console.log("DISCONNECTED");
 }
 
 function onMessage(evt) {
-    // log('Recieved: ' + evt.data);
-	var files = JSON.parse(evt.data.replace('(', '[').replace(')', ']'));
+	var files = JSON.parse(evt.data);
 	for (var i = 0; i < files.length; i++) {
 		var fl = files[i];
-		console.log("added:", fl);
-		addPathToTree(fl);
+		addPathToTree(fl.path, fl.size);
 	}
-    // websocket.close();
 }
 
 function onError(evt) {
-    log('ERROR: ' + evt.data);
-}
-
-function log(message) {
-    console.log(message);
+    console.log('ERROR: ' + evt.data);
 }
