@@ -1,7 +1,4 @@
-import tornado.web
 import tornado.websocket
-import tornado.ioloop
-
  
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
 	conns=[]
@@ -20,11 +17,20 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 	def check_origin(self, origin):
 		return True
 
-
+class MainHandler(tornado.web.RequestHandler):
+	def get(self):
+		self.render("../visualizer/index.html")
+		
 application = tornado.web.Application([
-    (r"/", WebSocketHandler),
+	(r"/socket", WebSocketHandler),
+	(r"/", MainHandler),
+	(r'/(.*)', tornado.web.StaticFileHandler, {"path": "../visualizer"}),
 ])
- 
+
+PORT=8888
+
+
 if __name__ == "__main__":
-    application.listen(8888)
-    tornado.ioloop.IOLoop.instance().start()
+	application.listen(PORT)
+	print "Visit: http://localhost:{0} to view the tree".format(PORT)
+	tornado.ioloop.IOLoop.instance().start()

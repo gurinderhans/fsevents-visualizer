@@ -1,7 +1,12 @@
-var wsUri = "ws://localhost:8888";
-testWebSocket();
+var supportsWebSockets = 'WebSocket' in window || 'MozWebSocket' in window;
+if (!supportsWebSockets) {
+	alert("Your browser does not support WebSocket(s). Try a modern browser!");
+} else {
+	openSocket();
+}
 
-function testWebSocket() {
+function openSocket() {
+	var wsUri = "ws://localhost:8888/socket";
     websocket = new WebSocket(wsUri);
     websocket.onopen = function(evt) { onOpen(evt) };
     websocket.onclose = function(evt) { onClose(evt) };

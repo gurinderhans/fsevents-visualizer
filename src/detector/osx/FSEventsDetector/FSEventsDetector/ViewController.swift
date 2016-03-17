@@ -15,7 +15,7 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let 😇 = WebSocket("ws://localhost:8888")
+        let 😇 = WebSocket("ws://localhost:8888/socket")
         😇.event.open = {
             print("opened")
         }

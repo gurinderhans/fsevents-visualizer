@@ -19,7 +19,7 @@ var nodes = [],
 
 var color = d3.scale.category20b();
 
-// add ROOT node
+// Add ROOT node
 nodes.push({
 	"path": "root",
 	"type": "tree",
@@ -159,7 +159,6 @@ function addPathToTree(path, size) {
 
 	if (localTreeBreakingIndex === undefined) {
 		// this is a totally new branch, add all nodes and hook first node to root and it's over
-		console.log("new branch");
 
 		// connect link back to root
 		treeLinks.unshift({
@@ -175,7 +174,7 @@ function addPathToTree(path, size) {
 			links.push(treeLinks[i])
 		}
 	} else {
-		// this is a partial branch, only add nodes > (localTreeBreakingIndex + 1) and hook proper links
+		// this is a partial branch, only add nodes > (localTreeBreakingIndex + 1) and connect the proper links
 
 		var newNodes = treeNodes.slice(localTreeBreakingIndex + 1, treeNodes.length);
 
@@ -200,6 +199,6 @@ function addPathToTree(path, size) {
 
 
 /// MARK:- Tests
-// addPathToTree("/var/www/html/other",123);
-// addPathToTree("/private/var/db/local",456);
-// addPathToTree("/var/www/html/mysite/js/jquerylib",789);
+// addPathToTree("/var/www/html/other", 123);
+// addPathToTree("/private/var/db/local", 456);
+// addPathToTree("/var/www/html/mysite/js/jquerylib", 789);
