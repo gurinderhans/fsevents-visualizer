@@ -9,11 +9,11 @@
    
  - Changes on the hard disk are:
    1. Adding: 
-     - When a new file is added on the hard disk, the program detects the added file and adds a new node to the graph.
+      - When a new file is added on the hard disk, the program detects the added file and adds a new node to the graph.
    2. Remove:
-     - When a file is removed from the hard disk, it removes the node from image.
+      - When a file is removed from the hard disk, it removes the node from image.
    3. Update:
-     - Any updates on the files, the color of the circle changes.
+      - Any updates on the files, the color of the circle changes.
 
 # Demo 
 <img src="demo.gif" alt="1" width=1000>
