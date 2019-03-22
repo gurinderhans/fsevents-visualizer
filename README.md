@@ -1,11 +1,25 @@
 # fsevents-visualizer
-Just something cool and random!
 
-# Demo OR What is this?
+ **LUMEMETHOD**
+ 
+ This software captures and visually displays any changed events occured on the hard disk.
+ - The image consists of circles and lines.
+   - Each circle represents a file or a folder
+   - Each line represents a path of those files or folders.
+   
+ - Changes on the hard disk are:
+   1. Adding: 
+     - When a new file is added on the hard disk, the program detects the added file and adds a new node to the graph.
+   2. Remove:
+     - When a file is removed from the hard disk, it removes the node from image.
+   3. Update:
+     - Any updates on the files, the color of the circle changes.
+
+# Demo 
 <img src="demo.gif" alt="1" width=1000>
 
 
-# How to Run
+# How to Run (macOS only)
 - `cd` into `src/server` and run the server.py (You'll most likely need to install the deps in `reqs.txt`)
   - And `python server.py`
 - Run the OSX app from `src/detector/osx/exported` OR `build` your own if you don't trust mines 🙃
